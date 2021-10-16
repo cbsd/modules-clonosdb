@@ -27,7 +27,7 @@ if [ -z "${workdir}" ]; then
 	exit 1
 fi
 
-MYPATH="${distmoduledir}/forms.d/${HELPER}"
+MYPATH="${distmoduledir}/${HELPER}"
 DBFILE="/var/db/clonos/clonos.sqlite"
 SALT_FILE="/var/db/clonos/salt"
 
