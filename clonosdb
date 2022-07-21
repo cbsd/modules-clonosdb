@@ -1,41 +1,39 @@
-#!/bin/sh
-MYDIR="$( /usr/bin/dirname $0 )"
-MYPATH="$( /bin/realpath ${MYDIR} )"
-HELPER="clonos_database"
+#!/usr/local/bin/cbsd
+MYARG=""
+MYOPTARG=""
+MYDESC="Generate/reset initial DB for ClonOS"
+CBSDMODULE="clonos"
+ADDHELP="
+${H3_COLOR}Description${N0_COLOR}:
 
-: ${distdir="/usr/local/cbsd"}
-# MAIN
-if [ -z "${workdir}" ]; then
-	[ -z "${cbsd_workdir}" ] && . /etc/rc.conf
-	[ -z "${cbsd_workdir}" ] && exit 0
-	workdir="${cbsd_workdir}"
-fi
+Generate initial ClonOS db.
 
-[ ! -f "${distdir}/cbsd.conf" ] && exit 0
+${H3_COLOR}Options${N0_COLOR}:
 
-set -e
-. ${distdir}/cbsd.conf
-. ${subrdir}/tools.subr
-. ${subr}
-set +e
 
-if [ -z "${workdir}" ]; then
-	echo "Error: CBSD workdir is not initialized"
-	echo "Please init CBSD first, e.g:"
-	echo "  env workdir=/usr/jails /usr/local/cbsd/sudoexec/initenv"
-	echo
-	exit 1
-fi
+${H3_COLOR}Examples${N0_COLOR}:
 
-MYPATH="${distmoduledir}/${HELPER}"
+ # cbsd clonosdb
+
+"
+
+. ${subrdir}/nc.subr
+. ${system}
+. ${strings}
+. ${tools}
+. ${cbsdinit}
+
+MYPATH="${distmoduledir}/clonosdb.d"
 DBFILE="/var/db/clonos/clonos.sqlite"
 SALT_FILE="/var/db/clonos/salt"
 
-if [ ! -r ${SALT_FILE} ]; then
-	SALT=$( /usr/bin/head -c 30 /dev/random | /usr/bin/uuencode -m - | /usr/bin/tail -n 2 | /usr/bin/head -n1 )
+if [ ! -r x${SALT_FILE} ]; then
+	# ZNINkHErdLQ0JjfhnkdTP33KXL4Sh2RaVJ6qF9lE
+	# hz165sD+NPlXhqCeGV233jzNIdWNHRApD2y7nNAN
+	SALT=$( random_password_gen -l 40 )
 	echo ${SALT} > ${SALT_FILE}
-	chmod 0440 ${SALT_FILE}
-	chown www:cbsd ${SALT_FILE}
+	${CHMOD_CMD} 0440 ${SALT_FILE}
+	${CHOWN_CMD} www:cbsd ${SALT_FILE}
 fi
 
 # sys_helpers_list, jails_helper_wl
@@ -44,7 +42,7 @@ fi
 /usr/local/bin/cbsd ${miscdir}/updatesql ${DBFILE} ${MYPATH}/auth_user.schema auth_user
 /usr/local/bin/cbsd ${miscdir}/updatesql ${DBFILE} ${MYPATH}/auth_list.schema auth_list
 
-/usr/local/bin/sqlite3 ${DBFILE} << EOF
+${SQLITE3_CMD} ${DBFILE} << EOF
 BEGIN TRANSACTION;
 DELETE FROM sys_helpers_list;
 INSERT INTO sys_helpers_list ( module ) VALUES ( "elasticsearch" );
@@ -70,23 +68,24 @@ INSERT INTO jails_helpers_list ( module ) VALUES ( "rtorrent" );
 COMMIT;
 EOF
 
-admin_user=$( /usr/local/bin/sqlite3 ${DBFILE} "SELECT username FROM auth_user" 2>/dev/null )
-
+admin_user=$( ${SQLITE3_CMD} ${DBFILE} "SELECT username FROM auth_user" 2>/dev/null )
 
 if [ -z "${admin_user}" ]; then
-	SALT=$( cat ${SALT_FILE} |awk '{printf $1}' )
-	echo "Add new admin user: admin/admin with salt: ${SALT}"
+	SALT=$( ${CAT_CMD} ${SALT_FILE} | ${AWK_CMD} '{printf $1}' )
+	${ECHO} "${N1_COLOR}${CBSD_APP}: added new admin user (salt: ${SALT}: ${N2_COLOR}admin/admin${N0_COLOR}"
 	echo ${SALT} > ${SALT_FILE}
 	password="admin"
-	hash1=$( sha256 -qs "${password}" )
+	hash1=$( ${SHA256_CMD} -qs "${password}" )
 	hash2="${hash1}${SALT}"
-	salted_hash=$( sha256 -qs "${hash2}" )
+	salted_hash=$( ${SHA256_CMD} -qs "${hash2}" )
 
-/usr/local/bin/sqlite3 ${DBFILE} << EOF
+${SQLITE3_CMD} ${DBFILE} << EOF
 BEGIN TRANSACTION;
 INSERT INTO auth_user ( username,password,first_name,last_name,is_active ) VALUES ( "admin", "${salted_hash}", "Admin", "Admin", 1 );
 COMMIT;
 EOF
 fi
 
-chown www:www ${DBFILE}
+${CHOWN_CMD} www:www ${DBFILE}
+
+exit 0
