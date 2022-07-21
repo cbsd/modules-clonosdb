@@ -68,7 +68,7 @@ INSERT INTO jails_helpers_list ( module ) VALUES ( "rtorrent" );
 COMMIT;
 EOF
 
-admin_user=$( ${SQLITE3_CMD} ${DBFILE} "SELECT username FROM auth_user" 2>/dev/null )
+admin_user=$( ${SQLITE3_CMD} ${DBFILE} "SELECT username FROM auth_user WHERE username=\"admin\" LIMIT 1" 2>/dev/null )
 
 if [ -z "${admin_user}" ]; then
 	SALT=$( ${CAT_CMD} ${SALT_FILE} | ${AWK_CMD} '{printf $1}' )
@@ -84,6 +84,8 @@ BEGIN TRANSACTION;
 INSERT INTO auth_user ( username,password,first_name,last_name,is_active ) VALUES ( "admin", "${salted_hash}", "Admin", "Admin", 1 );
 COMMIT;
 EOF
+else
+	${ECHO} "${N1_COLOR}${CBSD_APP}: admin account already exist${NORMAL}"
 fi
 
 ${CHOWN_CMD} www:www ${DBFILE}
