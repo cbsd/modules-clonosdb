@@ -72,7 +72,7 @@ admin_user=$( ${SQLITE3_CMD} ${DBFILE} "SELECT username FROM auth_user" 2>/dev/n
 
 if [ -z "${admin_user}" ]; then
 	SALT=$( ${CAT_CMD} ${SALT_FILE} | ${AWK_CMD} '{printf $1}' )
-	${ECHO} "${N1_COLOR}${CBSD_APP}: added new admin user (salt: ${SALT}: ${N2_COLOR}admin/admin${N0_COLOR}"
+	${ECHO} "${N1_COLOR}${CBSD_APP}: added new admin login/password (salt: ${SALT}): ${N2_COLOR}admin/admin${N0_COLOR}"
 	echo ${SALT} > ${SALT_FILE}
 	password="admin"
 	hash1=$( ${SHA256_CMD} -qs "${password}" )
