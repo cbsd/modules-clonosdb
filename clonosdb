@@ -27,7 +27,7 @@ MYPATH="${distmoduledir}/clonosdb.d"
 DBFILE="/var/db/clonos/clonos.sqlite"
 SALT_FILE="/var/db/clonos/salt"
 
-if [ ! -r x${SALT_FILE} ]; then
+if [ ! -r ${SALT_FILE} ]; then
 	# ZNINkHErdLQ0JjfhnkdTP33KXL4Sh2RaVJ6qF9lE
 	# hz165sD+NPlXhqCeGV233jzNIdWNHRApD2y7nNAN
 	SALT=$( random_password_gen -l 40 )
