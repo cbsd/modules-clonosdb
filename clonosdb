@@ -42,29 +42,30 @@ fi
 /usr/local/bin/cbsd ${miscdir}/updatesql ${DBFILE} ${MYPATH}/auth_user.schema auth_user
 /usr/local/bin/cbsd ${miscdir}/updatesql ${DBFILE} ${MYPATH}/auth_list.schema auth_list
 
+
 ${SQLITE3_CMD} ${DBFILE} << EOF
 BEGIN TRANSACTION;
 DELETE FROM sys_helpers_list;
-INSERT INTO sys_helpers_list ( module ) VALUES ( "elasticsearch" );
-INSERT INTO sys_helpers_list ( module ) VALUES ( "memcached" );
-INSERT INTO sys_helpers_list ( module ) VALUES ( "php" );
-INSERT INTO sys_helpers_list ( module ) VALUES ( "postgresql" );
-INSERT INTO sys_helpers_list ( module ) VALUES ( "prometheus" );
-INSERT INTO sys_helpers_list ( module ) VALUES ( "rabbitmq" );
-INSERT INTO sys_helpers_list ( module ) VALUES ( "redis" );
-INSERT INTO sys_helpers_list ( module ) VALUES ( "rtorrent" );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'elasticsearch' );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'memcached' );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'php' );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'postgresql' );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'prometheus' );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'rabbitmq' );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'redis' );
+INSERT INTO sys_helpers_list ( module ) VALUES ( 'rtorrent' );
 COMMIT;
 
 BEGIN TRANSACTION;
 DELETE FROM jails_helpers_list;
-INSERT INTO jails_helpers_list ( module ) VALUES ( "elasticsearch" );
-INSERT INTO jails_helpers_list ( module ) VALUES ( "memcached" );
-INSERT INTO jails_helpers_list ( module ) VALUES ( "php" );
-INSERT INTO jails_helpers_list ( module ) VALUES ( "postgresql" );
-INSERT INTO jails_helpers_list ( module ) VALUES ( "prometheus" );
-INSERT INTO jails_helpers_list ( module ) VALUES ( "rabbitmq" );
-INSERT INTO jails_helpers_list ( module ) VALUES ( "redis" );
-INSERT INTO jails_helpers_list ( module ) VALUES ( "rtorrent" );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'elasticsearch' );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'memcached' );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'php' );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'postgresql' );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'prometheus' );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'rabbitmq' );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'redis' );
+INSERT INTO jails_helpers_list ( module ) VALUES ( 'rtorrent' );
 COMMIT;
 EOF
 
@@ -81,7 +82,7 @@ if [ -z "${admin_user}" ]; then
 
 ${SQLITE3_CMD} ${DBFILE} << EOF
 BEGIN TRANSACTION;
-INSERT INTO auth_user ( username,password,first_name,last_name,is_active ) VALUES ( "admin", "${salted_hash}", "Admin", "Admin", 1 );
+INSERT INTO auth_user ( username,password,first_name,last_name,is_active ) VALUES ( 'admin', '${salted_hash}', 'Admin', 'Admin', 1 );
 COMMIT;
 EOF
 else
